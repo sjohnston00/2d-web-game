@@ -1,0 +1,13 @@
+{
+  "name": "2d-web-game",
+  "version": "1.0.0",
+  "main": "scripts/index.js",
+  "scripts": {
+    "dev": "tsc --watch",
+    "build": "tsc"
+  },
+  "keywords": [],
+  "dependencies": {
+    "typescript": "^5.4.5"
+  }
+}
