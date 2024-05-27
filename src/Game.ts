@@ -201,6 +201,7 @@ export default class Game {
 
   drawPlayerProjectileAmmount() {
     this.ctx.strokeStyle = '#000000'
+    this.ctx.fillStyle = '#000000'
     this.ctx.setLineDash([0])
     this.ctx.lineWidth = 1
     let x = this.playerState.x - 2
@@ -209,11 +210,14 @@ export default class Game {
     let height = 3
     const GAP = 8
 
-    for (let index = this.MAX_PROJECTILES - 1; index >= 0; index--) {
+    // for (let index = this.MAX_PROJECTILES - 1; index >= 0; index--) {
+    for (let index = 0; index < this.MAX_PROJECTILES; index++) {
       if (this.projectiles[index]) {
-        this.ctx.strokeRect(x + index * GAP, y, width, height)
+        this.ctx.fillStyle = '#dddddd'
+        this.ctx.fillRect(x + index * GAP, y, width, height)
       } else {
-        this.ctx.fillRect(x + index * GAP, y, width + 1, height + 1)
+        this.ctx.fillStyle = '#000000'
+        this.ctx.fillRect(x + index * GAP, y, width, height)
       }
     }
   }
