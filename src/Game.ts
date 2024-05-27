@@ -30,6 +30,9 @@ export default class Game {
   private moveState: KeyState
 
   private projectiles: Projectile[]
+  private MAX_PROJECTILES = 6
+
+  private readonly JUMPING_POWER = -17
 
   constructor() {
     const canvas = document.querySelector('canvas')
@@ -44,8 +47,8 @@ export default class Game {
     this.playerState = {
       x: 10,
       y: 594,
-      width: 25,
-      height: 25,
+      width: 40,
+      height: 40,
       x_moveSpeed: 3,
       y_moveSpeed: 0
     }
@@ -63,15 +66,12 @@ export default class Game {
     this.clearCanvas()
     this.drawLayout()
     this.drawPlayer()
+    this.drawPlayerProjectileAmmount()
     this.drawFPS()
     this.drawPlayerState()
     this.drawMoveState()
-    this.drawProjectsArray()
-
-    for (let index = 0; index < this.projectiles.length; index++) {
-      const projectile = this.projectiles[index]
-      projectile.draw()
-    }
+    this.drawProjectiles()
+    this.drawProjectilesArray()
   }
 
   update(timeStamp: number) {
@@ -102,12 +102,16 @@ export default class Game {
     }
     if (this.moveState['w'] && !this.playerState.isJumping) {
       this.playerState.isJumping = true
-      this.playerState.y_moveSpeed = -10
+      this.playerState.y_moveSpeed = this.JUMPING_POWER
     }
 
-    for (let index = 0; index < this.projectiles.length; index++) {
+    this.updateProjectiles()
+  }
+
+  drawProjectiles() {
+    for (let index = this.projectiles.length - 1; index >= 0; index--) {
       const projectile = this.projectiles[index]
-      projectile.update()
+      projectile.draw()
     }
   }
 
@@ -119,23 +123,27 @@ export default class Game {
     }
 
     window.addEventListener('keydown', (e) => {
-      this.moveState[e.key] = true
+      const key = e.key.toLowerCase()
+      this.moveState[key] = true
 
-      if (e.key === ' ') {
+      if (key === ' ' && this.projectiles.length < this.MAX_PROJECTILES) {
         this.projectiles.push(
           new Projectile({
             canvas: this.canvas,
             ctx: this.ctx,
-            x: this.playerState.x,
-            y: this.playerState.y,
-            angle: Math.random() * 10,
-            speed: Math.random() * 10 + 10
+            x: this.playerState.x + this.playerState.width,
+            y: this.playerState.y + this.playerState.height / 2,
+            angle: 0,
+            speed: 10
+            // angle: Math.random() * 10,
+            // speed: Math.random() * 10 + 10
           })
         )
       }
     })
     window.addEventListener('keyup', (e) => {
-      delete this.moveState[e.key]
+      const key = e.key.toLowerCase()
+      delete this.moveState[key]
     })
   }
 
@@ -160,7 +168,7 @@ export default class Game {
     this.ctx.fillText(JSON.stringify(this.moveState, null, 2), 10, 60)
   }
 
-  drawProjectsArray() {
+  drawProjectilesArray() {
     this.ctx.font = '12px Arial'
     this.ctx.fillStyle = 'black'
     this.ctx.fillText(`Projectiles: ${this.projectiles.length}`, 10, 75)
@@ -181,7 +189,6 @@ export default class Game {
   }
 
   drawPlayer() {
-    //TODO: show rectangles above player with amount of projectiles left
     this.ctx.strokeStyle = '#000000'
     this.ctx.setLineDash([0])
     this.ctx.lineWidth = 3
@@ -190,6 +197,41 @@ export default class Game {
     let width = this.playerState.width
     let height = this.playerState.height
     this.ctx.strokeRect(x, y, width, height)
+  }
+
+  drawPlayerProjectileAmmount() {
+    this.ctx.strokeStyle = '#000000'
+    this.ctx.setLineDash([0])
+    this.ctx.lineWidth = 1
+    let x = this.playerState.x - 2
+    let y = this.playerState.y - 10
+    let width = 5
+    let height = 3
+    const GAP = 8
+
+    for (let index = this.MAX_PROJECTILES - 1; index >= 0; index--) {
+      if (this.projectiles[index]) {
+        this.ctx.strokeRect(x + index * GAP, y, width, height)
+      } else {
+        this.ctx.fillRect(x + index * GAP, y, width + 1, height + 1)
+      }
+    }
+  }
+
+  updateProjectiles() {
+    for (let index = this.projectiles.length - 1; index >= 0; index--) {
+      const projectile = this.projectiles[index]
+      if (
+        projectile.x < 0 ||
+        projectile.x > this.canvas.width ||
+        projectile.y < 0 ||
+        projectile.y > this.canvas.height
+      ) {
+        this.projectiles.splice(index, 1)
+      } else {
+        projectile.update()
+      }
+    }
   }
 
   clearCanvas() {

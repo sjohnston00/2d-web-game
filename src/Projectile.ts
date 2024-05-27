@@ -3,6 +3,7 @@ type ProjectileConstructor = {
   ctx: CanvasRenderingContext2D
   x: number
   y: number
+  radius?: number
   speed?: number
   range?: number
   angle?: number
@@ -11,11 +12,12 @@ type ProjectileConstructor = {
 export default class Projectile {
   private canvas: HTMLCanvasElement
   private ctx: CanvasRenderingContext2D
-  private x: number
-  private y: number
+  public x: number
+  public y: number
   private speed: number
   private range: number
   private angle: number
+  private radius: number
 
   public startingX: number
   public startingY: number
@@ -27,7 +29,8 @@ export default class Projectile {
     y,
     angle = 0,
     range = Infinity,
-    speed = 10
+    speed = 10,
+    radius = 5
   }: ProjectileConstructor) {
     this.canvas = canvas
     this.ctx = ctx
@@ -39,6 +42,7 @@ export default class Projectile {
     this.angle = angle
     this.range = range
     this.speed = speed
+    this.radius = radius
   }
 
   draw() {
@@ -51,9 +55,8 @@ export default class Projectile {
     this.ctx.strokeStyle = '#000000'
     this.ctx.setLineDash([0])
     this.ctx.lineWidth = 3
-    let radius = 3
     this.ctx.beginPath()
-    this.ctx.arc(this.x, this.y, radius, 0, 2 * Math.PI)
+    this.ctx.arc(this.x, this.y, this.radius, 0, 2 * Math.PI)
     this.ctx.closePath()
     this.ctx.fill()
   }
