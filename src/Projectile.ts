@@ -1,26 +1,26 @@
-type ProjectileConstructor = {
-  canvas: HTMLCanvasElement
-  ctx: CanvasRenderingContext2D
-  x: number
-  y: number
-  radius?: number
-  speed?: number
-  range?: number
-  angle?: number
-}
+export type ProjectileConstructor = {
+  canvas: HTMLCanvasElement;
+  ctx: CanvasRenderingContext2D;
+  x: number;
+  y: number;
+  radius?: number;
+  speed?: number;
+  range?: number;
+  angle?: number;
+};
 
 export default class Projectile {
-  private canvas: HTMLCanvasElement
-  private ctx: CanvasRenderingContext2D
-  public x: number
-  public y: number
-  private speed: number
-  private range: number
-  private angle: number
-  private radius: number
+  public canvas: HTMLCanvasElement;
+  public ctx: CanvasRenderingContext2D;
+  public x: number;
+  public y: number;
+  public speed: number;
+  public range: number;
+  public angle: number;
+  public radius: number;
 
-  public startingX: number
-  public startingY: number
+  public startingX: number;
+  public startingY: number;
 
   constructor({
     canvas,
@@ -30,19 +30,19 @@ export default class Projectile {
     angle = 0,
     range = Infinity,
     speed = 10,
-    radius = 5
+    radius = 5,
   }: ProjectileConstructor) {
-    this.canvas = canvas
-    this.ctx = ctx
-    this.x = x
-    this.y = y
-    this.startingX = x
-    this.startingY = y
+    this.canvas = canvas;
+    this.ctx = ctx;
+    this.x = x;
+    this.y = y;
+    this.startingX = x;
+    this.startingY = y;
 
-    this.angle = angle
-    this.range = range
-    this.speed = speed
-    this.radius = radius
+    this.angle = angle;
+    this.range = range;
+    this.speed = speed;
+    this.radius = radius;
   }
 
   draw() {
@@ -50,19 +50,19 @@ export default class Projectile {
       Math.abs(this.x - this.startingX) > this.range ||
       Math.abs(this.y - this.startingY) > this.range
     ) {
-      return
+      return;
     }
-    this.ctx.strokeStyle = '#000000'
-    this.ctx.setLineDash([0])
-    this.ctx.lineWidth = 3
-    this.ctx.beginPath()
-    this.ctx.arc(this.x, this.y, this.radius, 0, 2 * Math.PI)
-    this.ctx.closePath()
-    this.ctx.fill()
+    this.ctx.strokeStyle = "#000000";
+    this.ctx.setLineDash([0]);
+    this.ctx.lineWidth = 3;
+    this.ctx.beginPath();
+    this.ctx.arc(this.x, this.y, this.radius, 0, 2 * Math.PI);
+    this.ctx.closePath();
+    this.ctx.fill();
   }
 
   update() {
-    this.x += this.speed * Math.cos(this.angle)
-    this.y += this.speed * Math.sin(this.angle)
+    this.x += this.speed * Math.cos(this.angle);
+    this.y += this.speed * Math.sin(this.angle);
   }
 }
