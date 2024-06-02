@@ -16,6 +16,13 @@ type KeyState = {
   [key: string]: boolean
 }
 
+type Obsticle = {
+  x: number
+  y: number
+  width: number
+  height: number
+}
+
 export default class Game {
   private GRAVITY = 1
   private canvas: HTMLCanvasElement
@@ -36,6 +43,8 @@ export default class Game {
   private readonly JUMPING_POWER = -17
 
   private mousePos: { x: number; y: number } = { x: 0, y: 0 }
+
+  private obsticles: Obsticle[]
 
   constructor() {
     const canvas = document.querySelector('canvas')
@@ -58,6 +67,26 @@ export default class Game {
 
     this.moveState = {}
     this.projectiles = []
+    this.obsticles = [
+      {
+        x: 150,
+        y: 500,
+        width: 200,
+        height: 20
+      },
+      {
+        x: 350,
+        y: 400,
+        width: 200,
+        height: 20
+      },
+      {
+        x: 550,
+        y: 300,
+        width: 200,
+        height: 20
+      }
+    ]
   }
 
   init() {
@@ -77,6 +106,9 @@ export default class Game {
     this.drawProjectilesArray()
     this.drawMousePos()
     this.drawMousePosAngleToPlayer()
+    this.drawCentrePoint()
+    this.drawLinePlayerToCentrePoint()
+    this.drawObsticules()
   }
 
   update(timeStamp: number) {
@@ -110,6 +142,8 @@ export default class Game {
       this.playerState.y_moveSpeed = this.JUMPING_POWER
     }
 
+    this.checkObsticleCollissions()
+
     this.updateProjectiles()
   }
 
@@ -117,6 +151,43 @@ export default class Game {
     for (let index = this.projectiles.length - 1; index >= 0; index--) {
       const projectile = this.projectiles[index]
       projectile.draw()
+    }
+  }
+
+  drawCentrePoint() {
+    const CENTRE_POINT_RADIUS = 20
+    this.ctx.beginPath()
+    this.ctx.arc(
+      this.canvas.width / 2 - CENTRE_POINT_RADIUS / 2,
+      this.canvas.height / 2 - CENTRE_POINT_RADIUS / 2,
+      CENTRE_POINT_RADIUS,
+      0,
+      2 * Math.PI
+    )
+    this.ctx.closePath()
+    this.ctx.fill()
+  }
+
+  drawLinePlayerToCentrePoint() {
+    this.ctx.beginPath()
+    this.ctx.moveTo(
+      this.playerState.x + this.playerState.width / 2,
+      this.playerState.y + this.playerState.height / 2
+    )
+    this.ctx.lineTo(this.canvas.width / 2 - 10, this.canvas.height / 2 - 10)
+    this.ctx.stroke()
+    this.ctx.closePath()
+  }
+
+  drawObsticules() {
+    for (let index = 0; index < this.obsticles.length; index++) {
+      const obsticule = this.obsticles[index]
+      this.ctx.fillRect(
+        obsticule.x,
+        obsticule.y,
+        obsticule.width,
+        obsticule.height
+      )
     }
   }
 
@@ -293,6 +364,27 @@ export default class Game {
         this.projectiles.splice(index, 1)
       } else {
         projectile.update()
+      }
+    }
+  }
+
+  checkObsticleCollissions() {
+    const bottomOfPlayer = this.playerState.y + this.playerState.height
+    const leftOfPlayer = this.playerState.x
+    const rightOfPlayer = this.playerState.x + this.playerState.width
+    for (let index = 0; index < this.obsticles.length; index++) {
+      const obsticule = this.obsticles[index]
+
+      //if player bottom is inside the obsticule then pin them on top
+      if (
+        bottomOfPlayer > obsticule.y &&
+        bottomOfPlayer < obsticule.y + obsticule.height &&
+        rightOfPlayer > obsticule.x &&
+        leftOfPlayer < obsticule.x + obsticule.width
+      ) {
+        this.playerState.y = obsticule.y - this.playerState.height
+        this.playerState.y_moveSpeed = 0
+        this.playerState.isJumping = false
       }
     }
   }
