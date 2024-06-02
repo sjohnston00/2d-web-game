@@ -134,16 +134,18 @@ export default class Game {
 
     window.addEventListener('keydown', (e) => {
       const key = e.key.toLowerCase()
-      console.log(key)
+      // console.log(key)
 
       this.moveState[key] = true
 
-      if (key === ' ' && this.projectiles.length < this.MAX_PROJECTILES) {
+      if (key === ' ' && this.projectiles.length <= this.MAX_PROJECTILES) {
         const lastProjecile = this.projectiles[this.projectiles.length - 1]
         if (lastProjecile && !lastProjecile.isStationary) {
           this.projectiles[this.projectiles.length - 1].isStationary = true
           return
         }
+        //if we have no more projectiles left to shoot
+        if (this.projectiles.length == this.MAX_PROJECTILES) return
 
         const dy =
           this.playerState.y + this.playerState.height / 2 - this.mousePos.y
@@ -158,7 +160,6 @@ export default class Game {
             ctx: this.ctx,
             x: this.playerState.x + this.playerState.width,
             y: this.playerState.y + this.playerState.height / 2,
-            angle: theta,
             speed: 10
             // angle: Math.random() * 10,
             // speed: Math.random() * 10 + 10
